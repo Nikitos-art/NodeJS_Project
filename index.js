@@ -1,39 +1,28 @@
-"Напишите программу для вывода в консоль простых чисел, чтобы они попадали в указанный диапазон включительно."
-"При этом числа должны окрашиваться в цвета по принципу светофора:"
-"первое число выводится зелёным цветом;"
-"второе — жёлтым;"
-"третье — красным."
-"Диапазон, куда попадут числа, указывается при запуске программы."
-"Если простых чисел в диапазоне нет, нужно, чтобы программа сообщила об этом в терминале красным цветом."
-"Если аргумент, переданный при запуске, не считается числом — сообщите об этом ошибкой и завершите программу."
-
 const colors = require("colors");
-const ps = require("prompt-sync");
-const prompt = ps();
+const prompt = require("prompt-sync")();
+const minNumber = parseInt(prompt("Enter min number :  "));
+const maxNumber = parseInt(prompt("Enter max number :  "));
+const rangeInt = []
+for (let i = minNumber; i <= maxNumber; i++){
+  rangeInt.push(i);
+};
 
-let min = prompt("Enter min num :  ");
-let max = prompt("Enter max num :  ");
-
-let prime = [];
-
-for (let num = min; num < max; num++) {
-    if (num % 2 !== 0) {
-        if (num % 3 !== 0) {
-            if (num % 5 !== 0) {
-                if (num % 7 !== 0) {
-                    if (num % 11 !== 0) {
-                        prime.push(num);
-                    }
-                }
-            }
-        }
+function isPrime(num) {
+  for (let i = 2; num > i; i++) {
+    if (num % i == 0) {
+      return false;
     }
+  }
+  return num > 1;
 }
 
-console.log(colors.bgGreen(prime[1]));
-console.log(colors.bgYellow(prime[1]));
-console.log(colors.bgRed(prime[1]));
+const results = rangeInt.filter(isPrime);
 
-
-
-
+if (results.length == 0) {
+  console.log('No prime numbers found'.red)
+} else{
+  console.log(colors.bgGreen(results[0]));
+  console.log(colors.bgYellow(results[1]));
+  console.log(colors.bgRed(results[2]));
+  console.log(results.slice(3));
+}
