@@ -1,39 +1,23 @@
-"Напишите программу для вывода в консоль простых чисел, чтобы они попадали в указанный диапазон включительно."
-"При этом числа должны окрашиваться в цвета по принципу светофора:"
-"первое число выводится зелёным цветом;"
-"второе — жёлтым;"
-"третье — красным."
-"Диапазон, куда попадут числа, указывается при запуске программы."
-"Если простых чисел в диапазоне нет, нужно, чтобы программа сообщила об этом в терминале красным цветом."
-"Если аргумент, переданный при запуске, не считается числом — сообщите об этом ошибкой и завершите программу."
-
+var countDownDate = new Date("Feb 8, 2022 17:37:00").getTime();
 const colors = require("colors");
-const ps = require("prompt-sync");
-const prompt = ps();
-
-let min = prompt("Enter min num :  ");
-let max = prompt("Enter max num :  ");
-
-let prime = [];
-
-for (let num = min; num < max; num++) {
-    if (num % 2 !== 0) {
-        if (num % 3 !== 0) {
-            if (num % 5 !== 0) {
-                if (num % 7 !== 0) {
-                    if (num % 11 !== 0) {
-                        prime.push(num);
-                    }
-                }
-            }
-        }
-    }
-}
-
-console.log(colors.bgGreen(prime[1]));
-console.log(colors.bgYellow(prime[1]));
-console.log(colors.bgRed(prime[1]));
+const prompt = require("prompt-sync")();
+var countDownDate = new Date(prompt("Введите дату и вермя (час-день-месяц-год):"));
 
 
+var x = setInterval(function() {
+  var now = new Date().getTime();
+  var distance = countDownDate - now;
+  var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+  var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+  var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+  var months = Math.floor(distance / (1000 * 60 * 60 * 24 * 30));
+  var years = Math.floor(distance / (1000 * 60 * 60 * 24 * 30 * 12));
 
+  console.log(colors.bgGreen(`seconds:${seconds}  minutes:${minutes}  hours:${hours}  days:${days}  months:${months}  years:${years}`));
 
+  if (distance < 0) {
+    clearInterval(x);
+    console.log("TIME'S UP!");
+  }
+}, 1000);
