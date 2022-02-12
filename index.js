@@ -1,23 +1,30 @@
-var countDownDate = new Date("Feb 8, 2022 17:37:00").getTime();
-const colors = require("colors");
-const prompt = require("prompt-sync")();
-var countDownDate = new Date(prompt("Введите дату и вермя (час-день-месяц-год):"));
+const PATH = 'C:/Users/Admin/Downloads/access.log'
 
 
-var x = setInterval(function() {
-  var now = new Date().getTime();
-  var distance = countDownDate - now;
-  var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-  var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-  var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-  var months = Math.floor(distance / (1000 * 60 * 60 * 24 * 30));
-  var years = Math.floor(distance / (1000 * 60 * 60 * 24 * 30 * 12));
+var fs = require('fs'),
+    readline = require('readline'),
+    stream = require('stream');
+const { stdout } = require('process');
 
-  console.log(colors.bgGreen(`seconds:${seconds}  minutes:${minutes}  hours:${hours}  days:${days}  months:${months}  years:${years}`));
+var instream = fs.createReadStream(PATH);
+var outstream = fs.createWriteStream('89.123.1.41_requests.log');
+var outstream2 = fs.createWriteStream('34.48.240.111_requests.log');
 
-  if (distance < 0) {
-    clearInterval(x);
-    console.log("TIME'S UP!");
-  }
-}, 1000);
+
+var rl = readline.createInterface({
+    input: instream,
+    output: stdout,
+});
+
+rl.on('line', function(line) {
+
+    if (line.includes('89.123.1.41')) {
+        outstream.write(line + "\n")
+    }
+
+    if (line.includes('34.48.240.111')) {
+        outstream2.write(line + "\n")
+
+    }
+});
+
