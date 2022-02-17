@@ -1,43 +1,93 @@
-const prompt = require("prompt-sync")();
-const fs = require("fs");
-const yargs = require("yargs");
-const path = require("path");
-const readline = require('readline');
-const { stdout } = require('process');
-// const path_downloads_example = .//..//..//Downloads//access.log
-const userSearch = prompt("Enter your search:  ");
+// Используя наработки практического задания прошлого урока, создайте веб-версию приложения. Сделайте так, чтобы при запуске она:
 
+// показывала содержимое текущей директории;
+
+// давала возможность навигации по каталогам из исходной папки;
+
+// при выборе файла показывала его содержимое.
+
+const inquirer = require('inquirer');
+const yargs = require('yargs');
+const cluster = require('cluster');
+const os = require('os');
+const http = require('http');
+const fs = require('fs');
+const {lstatSync} = require('fs');
+const path = require('path');
+
+
+let currentDirectory = process.cwd();
 const options = yargs
-	.usage("Usage: -p <path>")
-	.option("p", { alias: "path", describe: "Path to file", type: "string", demandOption: true })
-	.argv;
+    .positional('d', {
+        describe: 'Path to directory',
+        default: process.cwd(),
+    })
+    .positional('p', {
+        describe: 'Pattern',
+        default: '',
+    }).argv;
+console.log(options);
 
-const filePath = path.join(__dirname, options.path);
-
-
-var instream = fs.createReadStream(filePath);
-var outstream = fs.createWriteStream('89.123.1.41_requests.log');
-var outstream2 = fs.createWriteStream('34.48.240.111_requests.log');
-var outstream3 = fs.createWriteStream('34.48.240.111_requests.log');
-
-var rl = readline.createInterface({
-    input: instream,
-    output: stdout,
-});
-
-rl.on('line', function(line) {
-
-    if (line.includes('89.123.1.41')) {
-        outstream.write(line + "\n")
+class ListItem {
+    constructor(path, fileName) {
+        this.path = path;
+        this.fileName = fileName;
     }
 
-    if (line.includes('34.48.240.111')) {
-        outstream2.write(line + "\n")
+    get isDir() {
+        return lstatSync(this.path).isDirectory();
     }
+}
 
-    if (line.includes(userSearch)) {
-        outstream3.write(line + "\n")
+const run = async () => {
+    const list = await fs.readdir(currentDirectory);
+    const items = list.map(fileName =>
+        new ListItem(path.join(currentDirectory, fileName), fileName));
+
+    const item = await inquirer
+        .prompt([
+            {
+                name: 'fileName',
+                type: 'list',
+                message: `Choose: ${currentDirectory}`,
+                choices: items.map(item => ({name: item.fileName, value: item})),
+            }
+        ])
+        .then(answer => answer.fileName);
+
+    if (item.isDir) {
+        currentDirectory = item.path;
+        return await run();
+    } else {
+        const data = await fs.readFile(item.path, 'utf-8');
+
+        if (options.p == null) console.log(data);
+        else {
+            const regExp = new RegExp(options.p, 'igm');
+            console.log(data.match(regExp));
+        }
     }
-});
+}
 
+run();
 
+  http.createServer((request, response) => {
+
+    setTimeout(() => {
+      if (request.method === 'GET') {
+      const filePath = path.join(__dirname, currentDirectory);
+
+      readStream = fs.createReadStream(filePath);
+
+      response.writeHead(200, { 'Content-Type': 'text/html'});
+
+      readStream.pipe(response);
+    } else if (request.method === 'POST') {
+      let data = '';
+
+      request.on('data', chunk => {
+        data += chunk;
+      });
+
+      request.on('end', () => {
+        const parsedData = JSON.parse(data)});
